@@ -1,0 +1,1 @@
+print("Thirdeye Signals is alive!")
