@@ -1,9 +1,9 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
+from textblob import TextBlob
 
 app = FastAPI()
 
-# This defines what data the AI expects to receive
 class SignalInput(BaseModel):
     data: str
 
@@ -17,9 +17,24 @@ def status():
 
 @app.post("/predict")
 def predict(input: SignalInput):
-    # AI model will go here later
+    # AI Analysis
+    blob = TextBlob(input.data)
+    sentiment = blob.sentiment.polarity
+
+    if sentiment > 0.2:
+        signal = "STRONG POSITIVE SIGNAL"
+        action = "BUY"
+    elif sentiment < -0.2:
+        signal = "STRONG NEGATIVE SIGNAL"
+        action = "SELL"
+    else:
+        signal = "NEUTRAL SIGNAL"
+        action = "HOLD"
+
     return {
         "received": input.data,
-        "prediction": "AI model not connected yet",
-        "status": "ready for AI"
+        "signal": signal,
+        "action": action,
+        "confidence": round(abs(sentiment) * 100, 2),
+        "status": "AI analysis complete"
     }
